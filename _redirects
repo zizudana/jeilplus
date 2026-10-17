@@ -1,0 +1,5 @@
+# Cloudflare 영구 이동(301) 규칙. 이전 주소로 들어온 방문자와 검색엔진을 새 페이지로 보냅니다.
+/bag /products/waste-management 301
+/bag.html /products/waste-management 301
+/products/chemical-waste-bags /products/waste-management 301
+/products/chemical-waste-bags.html /products/waste-management 301

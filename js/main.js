@@ -39,6 +39,22 @@
     if (image.complete) update();
   });
 
+  document.querySelectorAll("[data-gallery]").forEach(function (gallery) {
+    var main = gallery.querySelector("[data-gallery-main]");
+    var thumbs = gallery.querySelectorAll("[data-gallery-thumb]");
+    thumbs.forEach(function (thumb) {
+      thumb.addEventListener("click", function () {
+        var thumbImage = thumb.querySelector("img");
+        main.src = thumb.getAttribute("data-src");
+        main.alt = thumb.getAttribute("data-alt");
+        main.setAttribute("width", thumbImage.getAttribute("width"));
+        main.setAttribute("height", thumbImage.getAttribute("height"));
+        thumbs.forEach(function (other) { other.removeAttribute("aria-current"); });
+        thumb.setAttribute("aria-current", "true");
+      });
+    });
+  });
+
   document.querySelectorAll("[data-year]").forEach(function (element) {
     element.textContent = String(new Date().getFullYear());
   });

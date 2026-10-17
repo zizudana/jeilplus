@@ -1,69 +1,66 @@
-# 제일플러스 JPD 정적 홈페이지
+# 제일플러스 JPD 정적 홈페이지 (www.jpd.kr)
 
-이 폴더의 내용 전체를 웹호스팅의 홈페이지 루트에 업로드하면 작동합니다.
+Cloudflare에 배포되는 정적 사이트입니다. 제품 페이지는 데이터 파일에서 자동 생성합니다.
 
-## 업로드 전 반드시 확인할 항목
+## 구조
 
-1. `images` 폴더에 실제 제품 사진 3장을 넣습니다.
-2. `LLDE85`가 맞는지, `LLDPE85`가 맞는지 확인합니다.
-3. 회사명 표기를 `제이피디`와 `제일플러스` 중 어떻게 사용할지 확인합니다.
-4. 대표전화, 휴대전화, 이메일, 주소를 확인합니다.
-5. 개인정보처리방침을 실제 사업자의 처리 절차에 맞게 검토합니다.
-6. HTTPS 적용 후 canonical URL이 실제 대표 도메인과 일치하는지 확인합니다.
+- `data/products.mjs`: 회사 정보, 카테고리 3개, 제품 20개 (이름·설명·규격·가격·사진·FAQ)
+- `scripts/build.mjs`: 데이터 파일로 `index.html`, `products/*.html`, `sitemap.xml`을 생성
+- `scripts/serve.mjs`: 로컬 미리보기 서버 (Cloudflare처럼 확장자 없는 주소 지원)
+- `images/products/`: 제품 사진 (`<제품주소>-<번호>.jpg`, 긴 변 1200px)
+- `_redirects`: 이전 주소(`/bag`, `/products/chemical-waste-bags`)의 301 이동 규칙
+- 직접 수정하는 파일: `privacy.html`, `404.html`, `css/style.css`, `js/main.js`
 
-## 제품 사진 경로
+생성되는 HTML 파일(`index.html`, `products/*.html`, `sitemap.xml`)은 직접 고치지 마세요. 다시 빌드하면 덮어씁니다.
 
-사진 3장은 크기별 사진이 아니라 제품 종류별 사진입니다.
+## 제품 추가·수정
 
-산·알칼리·유기 제품은 소·중·대 전 규격이 모두 반투명입니다.
+1. 사진을 `images/products/<제품주소>-1.jpg` 형식으로 넣습니다. 맥에서는 아래 명령으로 크기를 줄일 수 있습니다.
+   `sips -Z 1200 -s format jpeg -s formatOptions 62 원본.jpg --out images/products/새제품-1.jpg`
+2. `data/products.mjs`의 `products` 목록에 항목을 추가하거나 수정합니다. 기존 항목을 복사해 쓰면 편합니다.
+3. 아래 명령으로 빌드하고 미리 봅니다.
 
-- 산(ACID): `images/product-acid.jpg`
-- 알칼리(ALKALI): `images/product-alkali.jpg`
-- 유기(ORGANIC): `images/product-organic.jpg`
+```bash
+node scripts/build.mjs
+node scripts/serve.mjs
+```
 
-같은 파일명으로 사진을 넣으면 별도의 HTML 수정 없이 자동 표시됩니다.
+브라우저에서 http://localhost:8765 를 엽니다.
 
-## 회사 정보 수정
+4. 커밋하고 GitHub에 푸시하면 Cloudflare에 배포됩니다.
 
-텍스트 편집기에서 아래 기존 값을 검색하여 일괄 교체합니다.
+## 콘텐츠 기준
 
-- 대표전화: `02-487-0396` / 링크용 `024870396`
-- 휴대전화: `010-3782-9982` / 링크용 `01037829982`
-- 이메일: `s-bar@hanmail.net`
-- 주소: `경기도 안산시 단원구 성곡로198번길 21`
+- 가격·규격·제품코드는 다음(Daum) 카페 "제일플러스 제품" 게시판 글을 기준으로 합니다: https://cafe.daum.net/jeilplus/llIa
+- 카페에 가격이 있는 제품은 가격을 공개하고, 없는 제품은 견적 문의로 표시합니다.
+- SUS 맞춤 제작품(`custom: true`)은 제작 사례 금액이므로 구조화 데이터에 판매 가격(Offer)을 넣지 않습니다.
+- 성능을 보증하는 표현은 쓰지 않습니다. 폐기물 봉투는 분류용이며 내화학 성능을 보증하지 않는다는 안내를 유지합니다.
+- 고객사 이름은 확인과 동의 없이 사이트에 적지 않습니다.
 
-회사 정보는 `index.html`, `privacy.html`, 제품 페이지 3개 및 구조화 데이터에 포함되어 있습니다. SEO를 위해 실제 HTML에 넣은 것이므로 변경 시 폴더 전체에서 검색하여 교체해 주세요.
+## 회사 정보
 
-## FTP 업로드 순서
+`data/products.mjs`의 `company`에서 바꾸고 다시 빌드하면 전 페이지에 반영됩니다. `privacy.html`은 직접 수정해야 합니다.
 
-1. 기존 홈페이지 파일을 컴퓨터에 백업합니다.
-2. 이 폴더 안의 파일과 폴더 전체를 홈페이지 루트에 업로드합니다.
-3. `index.html`, `css`, `js`, `images`, `products`, `robots.txt`, `sitemap.xml`이 같은 구조로 올라갔는지 확인합니다.
-4. 브라우저에서 메인 페이지를 확인합니다.
-5. 모바일에서 대표전화, 휴대전화, 이메일 버튼을 테스트합니다.
-
-`bag.html`과 `products/chemical-waste-bags.html`은 이전 주소 방문자를 메인 제품 안내로 이동시키는 호환 페이지입니다. 제품별 검색 노출을 위한 실제 페이지는 다음 3개입니다.
-
-- 산: `products/acid-waste-bag.html`
-- 알칼리: `products/alkali-waste-bag.html`
-- 유기: `products/organic-waste-bag.html`
+- 대표전화 02-487-0396 / 휴대전화 010-3782-9982 / 이메일 s-bar@hanmail.net
+- 주소: 경기도 안산시 단원구 지원로 196
 
 ## 검색엔진 등록
 
-### 네이버
-
-1. 네이버 서치어드바이저 웹마스터 도구에 `https://www.jpd.kr`을 등록합니다.
-2. HTML 파일 또는 메타 태그 방식으로 소유권을 확인합니다.
-3. `https://www.jpd.kr/sitemap.xml`을 제출합니다.
-4. 메인 페이지와 제품 페이지 3개의 URL 수집을 각각 요청합니다.
-
 ### 구글
 
-1. Google Search Console에서 도메인 속성 또는 URL 접두어 속성을 등록합니다.
-2. DNS 또는 HTML 파일로 소유권을 확인합니다.
-3. `sitemap.xml`을 제출합니다.
-4. URL 검사에서 메인 페이지와 제품 페이지 3개의 색인 생성을 각각 요청합니다.
+1. Google Search Console에 `https://www.jpd.kr` 속성을 등록하고 소유권을 확인합니다 (DNS 또는 HTML 파일 방식).
+2. `https://www.jpd.kr/sitemap.xml`을 제출합니다.
+3. URL 검사에서 메인, `/products/`, 카테고리 3개, 주요 제품 페이지의 색인 생성을 요청합니다.
+4. Google 비즈니스 프로필에 업체(주소·전화·웹사이트)를 등록합니다.
 
-### 구조화 데이터
+### 네이버
 
-Google Rich Results Test 및 Schema.org Validator에서 메인 페이지와 제품 페이지 3개를 검사합니다. 가격, 평점, 리뷰는 실제 정보가 없으므로 구조화 데이터에 넣지 않았습니다.
+1. 네이버 서치어드바이저에 사이트맵을 다시 제출하고, 주요 페이지 수집을 요청합니다.
+
+### 카페 연동
+
+카페에 새 제품 글을 쓸 때 글 끝에 사이트의 해당 제품 페이지 링크를 붙입니다. 사이트 설명을 카페보다 자세하게 유지해야 구글이 사이트 페이지를 원본으로 봅니다.
+
+### 구조화 데이터 검사
+
+Google Rich Results Test(https://search.google.com/test/rich-results)에서 메인과 제품 페이지를 검사합니다.
