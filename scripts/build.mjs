@@ -39,8 +39,15 @@ function img(image, attrs = "", alt = image.alt) {
   const { w, h } = jpegSize(image.file);
   return `<img src="${imgPath(image.file)}" alt="${esc(alt)}" width="${w}" height="${h}" ${attrs}/>`;
 }
-const priceFrom = (p) => (p.options ? Math.min(...p.options.map((o) => o.price)) : p.price);
-const priceLabel = (p) => (p.options ? `${won(priceFrom(p))}~ / ${p.priceUnit}` : `${won(p.price)} / ${p.priceUnit}`);
+// 가격은 카페 게시글에 적힌 금액만 씁니다. 금액이 없으면 price를 비워 두고 "견적 문의"로 표시합니다.
+const isPrice = (n) => typeof n === "number" && n > 0;
+const knownPrices = (p) => (p.options ? p.options.map((o) => o.price) : [p.price]).filter(isPrice);
+const priceLabel = (p) => {
+  const prices = knownPrices(p);
+  if (!prices.length) return "견적 문의";
+  const many = p.options && p.options.length > 1;
+  return `${won(Math.min(...prices))}${many ? "~" : ""} / ${p.priceUnit}`;
+};
 
 function jsonLd(graph) {
   return `<script type="application/ld+json">\n${JSON.stringify({ "@context": "https://schema.org", "@graph": graph }, null, 2)}\n    </script>`;
@@ -85,11 +92,12 @@ function productLd(p) {
   if (code && !code[1].includes("시리즈")) ld.sku = code[1];
   const material = p.specs.find(([k]) => k === "재질");
   if (material) ld.material = material[1];
-  // 맞춤 제작품의 금액은 제작 사례 기준이라 판매 Offer로 표시하지 않습니다.
-  if (!p.custom) {
-    ld.offers = p.options
-      ? { "@type": "AggregateOffer", priceCurrency: "KRW", lowPrice: Math.min(...p.options.map((o) => o.price)), highPrice: Math.max(...p.options.map((o) => o.price)), offerCount: p.options.length, seller: orgRef }
-      : { "@type": "Offer", priceCurrency: "KRW", price: p.price, url: abs(productPath(p)), seller: orgRef };
+  // 카페에 적힌 금액이 있는 제품만 Offer를 넣습니다. 금액이 없는 제품에 임의 가격을 넣지 않습니다.
+  const prices = knownPrices(p);
+  if (prices.length) {
+    ld.offers = p.options && p.options.length > 1
+      ? { "@type": "AggregateOffer", priceCurrency: "KRW", lowPrice: Math.min(...prices), highPrice: Math.max(...prices), offerCount: prices.length, seller: orgRef }
+      : { "@type": "Offer", priceCurrency: "KRW", price: prices[0], url: abs(productPath(p)), seller: orgRef };
   }
   return ld;
 }
@@ -156,7 +164,7 @@ function breadcrumbs(items) {
 }
 
 function productCard(p, { lazy = true } = {}) {
-  return `<article class="product-card"><a class="card-link" href="${productPath(p)}"><div class="photo-frame product-photo">${img(p.images[0], lazy ? 'loading="lazy" ' : "")}</div><div class="product-body"><span class="type-label ${p.tagClass || "label-default"}">${esc(p.tag)}</span><h3>${esc(p.name)}</h3><p>${esc(p.short)}</p><strong class="card-price">${p.custom ? "제작 사례 " : ""}${priceLabel(p)}</strong><span class="product-link">자세히 보기 →</span></div></a></article>`;
+  return `<article class="product-card"><a class="card-link" href="${productPath(p)}"><div class="photo-frame product-photo">${img(p.images[0], lazy ? 'loading="lazy" ' : "")}</div><div class="product-body"><span class="type-label ${p.tagClass || "label-default"}">${esc(p.tag)}</span><h3>${esc(p.name)}</h3><p>${esc(p.short)}</p><strong class="card-price">${priceLabel(p)}</strong><span class="product-link">자세히 보기 →</span></div></a></article>`;
 }
 
 // ───────── 메인 페이지 ─────────
@@ -271,7 +279,7 @@ function productPage(p) {
             ${p.images.length > 1 ? `<div class="gallery-thumbs">${p.images.map((im, i) => `<button type="button" data-gallery-thumb data-src="${imgPath(im.file)}" data-alt="${esc(im.alt)}"${i === 0 ? ' aria-current="true"' : ""}><span class="sr-only">${i + 1}번 사진 보기</span>${img(im, 'loading="lazy" ', "")}</button>`).join("")}</div>` : ""}
           </div>`;
   const priceBlock = p.options
-    ? `<table class="price-table"><caption class="sr-only">${esc(p.name)} 규격별 가격</caption><thead><tr><th scope="col">규격</th><th scope="col">크기</th><th scope="col">제품코드</th><th scope="col">판매가</th></tr></thead><tbody>${p.options.map((o) => `<tr><th scope="row">${o.label}</th><td>${o.size}</td><td>${o.code || "문의"}</td><td>${won(o.price)}</td></tr>`).join("")}</tbody></table>`
+    ? `<table class="price-table"><caption class="sr-only">${esc(p.name)} 규격별 가격</caption><thead><tr><th scope="col">규격</th><th scope="col">크기</th><th scope="col">제품코드</th><th scope="col">판매가</th></tr></thead><tbody>${p.options.map((o) => `<tr><th scope="row">${o.label}</th><td>${o.size}</td><td>${o.code || "문의"}</td><td>${isPrice(o.price) ? won(o.price) : "견적 문의"}</td></tr>`).join("")}</tbody></table>`
     : "";
   const body = `${breadcrumbs(crumbs)}
       <section class="product-detail-hero">
@@ -282,7 +290,7 @@ function productPage(p) {
             <h1>${p.h1 || esc(p.name)}</h1>
             <p class="detail-product-name">${esc(p.name)}</p>
             <p class="detail-lead">${esc(p.lead)}</p>
-            <dl class="detail-summary">${summary.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}<div><dt>${p.custom ? "제작 금액" : "판매가"}</dt><dd class="price">${priceLabel(p)}${p.custom ? ' <small>(제작 사례 기준)</small>' : ""}</dd></div></dl>
+            <dl class="detail-summary">${summary.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}<div><dt>판매가</dt><dd class="price">${priceLabel(p)}${p.custom && knownPrices(p).length ? ' <small>(기본 규격 기준)</small>' : ""}</dd></div></dl>
             <div class="detail-actions"><a class="button button-primary" href="${telLink(C.mobile)}">${C.mobile} 전화 문의</a><a class="button button-outline" href="mailto:${C.email}?subject=${encodeURIComponent(`[견적 문의] ${p.name}`)}">이메일 견적 문의</a></div>
             ${p.imarket ? `<p class="imarket">아이마켓코리아 코드 <strong>${p.imarket}</strong></p>` : ""}
           </div>
@@ -309,8 +317,8 @@ ${p.chemicals ? `
           <div class="section-heading"><p>SPECIFICATION</p><h2>${p.custom ? "제작 규격" : "규격 및 가격"}</h2></div>
           <div class="spec-content">
             ${priceBlock}
-            <dl class="common-spec">${p.specs.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}${p.options ? "" : `<div><dt>${p.custom ? "제작 금액" : "판매가"}</dt><dd>${priceLabel(p)}</dd></div>`}</dl>
-            <p class="spec-note">${esc(p.priceNote || (p.custom ? "제작 사례 기준 금액입니다. 치수·수량·구성에 따라 달라지므로 도면이나 현장 치수를 보내 주시면 견적을 드립니다." : "표시 가격은 판매가 기준이며 수량·납품 조건에 따라 달라질 수 있습니다. 부가세 포함 여부와 대량 단가는 문의해 주세요."))}</p>
+            <dl class="common-spec">${p.specs.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}${p.options ? "" : `<div><dt>판매가</dt><dd>${priceLabel(p)}</dd></div>`}</dl>
+            <p class="spec-note">${esc(p.priceNote || (p.custom ? "위 규격 기준 판매가입니다. 치수·구성을 바꾸면 금액이 달라지므로 도면이나 현장 치수를 보내 주시면 견적을 드립니다." : "표시 가격은 판매가 기준이며 수량·납품 조건에 따라 달라질 수 있습니다. 부가세 포함 여부와 대량 단가는 문의해 주세요."))}</p>
             ${p.caution && !p.chemicals ? `<p class="spec-note spec-caution">${esc(p.caution)}</p>` : ""}
           </div>
         </div>
