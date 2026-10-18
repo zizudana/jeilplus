@@ -82,7 +82,6 @@ function productLd(p) {
     "@id": abs(productPath(p)) + "#product",
     name: p.name,
     description: p.description,
-    category: catBySlug[p.category].name,
     image: p.images.map((i) => abs(imgPath(i.file))),
     url: abs(productPath(p)),
     brand: { "@type": "Brand", name: "JPD" },
@@ -95,9 +94,11 @@ function productLd(p) {
   // 카페에 적힌 금액이 있는 제품만 Offer를 넣습니다. 금액이 없는 제품에 임의 가격을 넣지 않습니다.
   const prices = knownPrices(p);
   if (prices.length) {
+    // 재고 상태는 확인된 경우에만 넣습니다. 맞춤 제작품은 주문 후 제작(MadeToOrder)입니다.
+    const availability = p.availability || (p.custom ? "MadeToOrder" : null);
     ld.offers = p.options && p.options.length > 1
-      ? { "@type": "AggregateOffer", priceCurrency: "KRW", lowPrice: Math.min(...prices), highPrice: Math.max(...prices), offerCount: prices.length, seller: orgRef }
-      : { "@type": "Offer", priceCurrency: "KRW", price: prices[0], url: abs(productPath(p)), seller: orgRef };
+      ? { "@type": "AggregateOffer", priceCurrency: "KRW", lowPrice: Math.min(...prices), highPrice: Math.max(...prices), offerCount: prices.length, seller: orgRef, ...(availability && { availability: `https://schema.org/${availability}` }) }
+      : { "@type": "Offer", priceCurrency: "KRW", price: prices[0], url: abs(productPath(p)), seller: orgRef, ...(availability && { availability: `https://schema.org/${availability}` }) };
   }
   return ld;
 }
