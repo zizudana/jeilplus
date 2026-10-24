@@ -134,7 +134,7 @@ function layout({ path, title, description, ogType = "website", ogImage, ld, bod
       <div class="container nav-wrap">
         <a class="brand" href="/" aria-label="${esc(C.name)} 홈"><span class="brand-mark" aria-hidden="true">J</span><span><strong>JPD</strong><small>제일플러스</small></span></a>
         <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" data-menu-toggle><span class="sr-only">메뉴 열기</span><i></i><i></i><i></i></button>
-        <nav id="primary-navigation" class="primary-nav" aria-label="주요 메뉴" data-menu>${categories.map((c) => `<a href="${categoryPath(c)}"${path.startsWith(categoryPath(c)) || (bySlug[path.split("/").pop()]?.category === c.slug) ? ' aria-current="true"' : ""}>${c.name}</a>`).join("")}<a href="/products/">전체 제품</a><a href="#contact">문의하기</a></nav>
+        <nav id="primary-navigation" class="primary-nav" aria-label="주요 메뉴" data-menu><a href="${WASTE_BAGS_PATH}"${path === WASTE_BAGS_PATH ? ' aria-current="true"' : ""}>폐기물 봉투</a>${categories.map((c) => `<a href="${categoryPath(c)}"${path.startsWith(categoryPath(c)) || (bySlug[path.split("/").pop()]?.category === c.slug) ? ' aria-current="true"' : ""}>${c.name}</a>`).join("")}<a href="/products/">전체 제품</a><a href="#contact">문의하기</a></nav>
         <a class="header-call" href="${telLink(C.mobile)}">전화 문의</a>
       </div>
     </header>
@@ -175,7 +175,7 @@ function homePage() {
         <div class="container hero-grid">
           <div>
             <p class="eyebrow">SEMICONDUCTOR · CLEANROOM SUPPLIES</p>
-            <h1>반도체·클린룸<br /><em>현장 소모품 전문</em></h1>
+            <h1>반도체 폐기물 봉투·<br /><em>클린룸 소모품 전문</em></h1>
             <p class="hero-summary">제일플러스는 반도체 FAB과 클린룸에서 쓰는 산·알칼리·유기 지정폐기물 봉투, 탄화사고 예방 발열감지 스티커, 웨이퍼 물류가방 같은 소모품을 공급하고, SUS304 보관함·수레·테이블을 현장 치수에 맞춰 제작합니다.</p>
             <div class="hero-actions"><a class="button button-primary" href="/products/">전체 제품 보기</a><a class="button button-light" href="${telLink(C.mobile)}">${C.mobile}</a></div>
           </div>
@@ -187,7 +187,7 @@ ${bags.map((p, i) => `            <article><a href="${productPath(p)}"><div clas
 
       <section class="section section-muted">
         <div class="container">
-          <div class="section-heading"><p>FEATURED · 탄화사고 예방</p><h2>30도 발열감지 폐기물 봉투</h2></div>
+          <div class="section-heading section-heading-row"><div><p>FEATURED · 탄화사고 예방</p><h2>30도 발열감지 폐기물 봉투</h2></div><a class="text-link" href="${WASTE_BAGS_PATH}">폐기물 봉투 규격·가격 비교 →</a></div>
           <p class="section-lead">성상별 색상(산 노랑 · 알칼리 파랑 · 유기 분홍)으로 구분하는 3중 지퍼 폐기물 봉투에 30도 변온 스티커를 붙였습니다. 봉투 안에서 반응열이 생기면 붉은 경고 문구가 나타나 탄화·화재 사고를 미리 알아챌 수 있습니다.</p>
           <div class="product-grid">${bags.map((p) => productCard(p)).join("")}</div>
         </div>
@@ -218,7 +218,7 @@ ${categories.map((c, ci) => `      <section class="section${ci % 2 ? " section-m
   ];
   return layout({
     path: "/",
-    title: "제일플러스 JPD | 반도체 지정폐기물 봉투·클린룸 소모품·SUS 맞춤 제작",
+    title: "폐기물 봉투·지정폐기물 봉투 전문 제일플러스 JPD | 반도체·클린룸 소모품·SUS 맞춤 제작",
     description: "산·알칼리·유기 지정폐기물 봉투, 30도 발열감지 스티커, 냄새방지 지정폐기물함, 웨이퍼 물류가방 등 반도체·클린룸 소모품 공급과 SUS304 보관함·수레 맞춤 제작. 안산 제일플러스 02-487-0396.",
     ogImage: imgPath(bags[0].images[0].file),
     ld,
@@ -270,10 +270,88 @@ function categoryPage(c) {
   });
 }
 
+// ───────── 폐기물 봉투 안내 ("폐기물 봉투" 검색용 대표 페이지) ─────────
+const WASTE_BAGS_PATH = "/products/waste-bags";
+const WASTE_BAGS_FAQ = [
+  ["폐기물 봉투는 어떤 것을 골라야 하나요?", "폐기물에 묻은 케미칼의 성상을 기준으로 고릅니다. HF·황산·인산 같은 산성은 노란색 산(ACID) 봉투, KOH·NaOH·암모니아수 같은 알칼리성은 파란색 알칼리(ALKALI) 봉투, IPA·아세톤·신나 같은 유기용제는 분홍색 유기(ORGANIC) 봉투를 씁니다. 부피가 크거나 날카로운 폐기물은 알루미늄 삼중 지퍼백을 검토해 주세요."],
+  ["일반 종량제 봉투와 무엇이 다른가요?", "제일플러스 폐기물 봉투는 반도체·클린룸 사업장에서 케미칼이 묻은 고형 폐기물을 성상별로 나누어 배출하기 위한 산업용 봉투입니다. PET·나일론·LLDPE 삼중합지 원단과 3중 지퍼로 만들었고, 대상 물질·배출 상한선·배출자 기재란이 인쇄되어 있습니다. 가정용 종량제 봉투는 판매하지 않습니다."],
+  ["30도 발열감지 스티커는 왜 붙어 있나요?", "성상이 다른 폐기물이 섞이면 봉투 안에서 반응열이 생겨 봉투가 녹거나 탄화될 수 있습니다. 스티커 부위가 약 30도 이상이 되면 붉은 경고 문구가 나타나 작업자가 이상 발열을 빨리 알아차리도록 돕습니다. 발열이나 화재를 막아 주는 장치는 아닙니다."],
+  ["소량도 구매할 수 있나요? 대량 단가는요?", "표시 가격은 1매 기준 판매가입니다. 필요한 규격과 수량을 전화나 이메일로 알려 주시면 대량 단가와 납품 조건을 안내해 드립니다."],
+  ["인쇄 문구나 크기를 바꿀 수 있나요?", "사업장 기준에 맞춘 인쇄 문구, 색상, 크기 변경을 상담해 드립니다. 수량과 원하는 내용을 함께 알려 주세요."],
+];
+
+function wasteBagsPage() {
+  const bags = ["acid-waste-bag", "alkali-waste-bag", "organic-waste-bag"].map((s) => bySlug[s]);
+  const al = bySlug["aluminum-zipper-bag"];
+  const extras = ["aluminum-zipper-bag", "heat-detection-sticker", "designated-waste-bin"].map((s) => bySlug[s]);
+  const color = (p) => p.specs.find(([k]) => k === "색상")[1];
+  const crumbs = [["홈", "/"], ["폐기물 관리 용품", "/products/waste-management"], ["폐기물 봉투", WASTE_BAGS_PATH]];
+  const title = "폐기물 봉투 | 산·알칼리·유기 지정폐기물 봉투 30도 발열감지 | 제일플러스 JPD";
+  const description = "반도체·클린룸용 폐기물 봉투. 산(노랑)·알칼리(파랑)·유기(분홍) 성상별 지정폐기물 봉투와 알루미늄 지퍼백, 30도 발열감지 스티커 부착. 규격별 가격 1매 900원부터, 대량 납품 상담.";
+  const body = `${breadcrumbs(crumbs)}
+      <section class="subpage-hero"><div class="container"><p class="eyebrow">WASTE BAGS</p><h1>폐기물 봉투</h1><p>반도체 FAB·클린룸에서 케미칼이 묻은 고형 폐기물을 산·알칼리·유기 성상별로 나누어 배출하는 지정폐기물 봉투입니다. 색상으로 성상을 구분하고, 3중 지퍼와 30도 발열감지 스티커로 탄화사고 위험을 줄였습니다. 제일플러스가 직접 공급합니다.</p></div></section>
+
+      <section class="section">
+        <div class="container">
+          <div class="section-heading"><p>BY WASTE TYPE</p><h2>성상별 폐기물 봉투</h2></div>
+          <div class="product-grid">${bags.map((p) => productCard(p, { lazy: false })).join("")}</div>
+        </div>
+      </section>
+
+      <section class="section section-muted">
+        <div class="container detail-spec-grid">
+          <div class="section-heading"><p>COMPARE</p><h2>폐기물 봉투 규격·가격 비교</h2></div>
+          <div class="spec-content">
+            <div class="table-scroll"><table class="price-table"><caption class="sr-only">폐기물 봉투 성상별 색상·규격·가격</caption><thead><tr><th scope="col">봉투</th><th scope="col">색상</th><th scope="col">대상 물질</th><th scope="col">규격</th><th scope="col">판매가</th></tr></thead><tbody>
+${bags.map((p) => `              <tr><th scope="row"><a href="${productPath(p)}">${esc(p.name)}</a></th><td>${esc(color(p))}</td><td>${{ "acid-waste-bag": "불산·황산·인산 등", "alkali-waste-bag": "KOH·NaOH·암모니아수 등", "organic-waste-bag": "IPA·아세톤·신나 등" }[p.slug]}</td><td>${p.options.map((o) => esc(o.label)).join("·")}</td><td>${priceLabel(p)}</td></tr>`).join("\n")}
+              <tr><th scope="row"><a href="${productPath(al)}">${esc(al.name)}</a></th><td>불투명 (알루미늄)</td><td>부피 큰·날카로운 폐기물</td><td>620 × 820mm</td><td>${priceLabel(al)}</td></tr>
+            </tbody></table></div>
+            <dl class="common-spec">${bags[0].specs.slice(0, 4).map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+            <p class="spec-note">${esc(bags[0].priceNote)}</p>
+            <p class="spec-note spec-caution">${esc(bags[0].caution)}</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container prose-grid">
+          <div class="section-heading"><p>HOW TO CHOOSE</p><h2>폐기물 봉투 고르는 법</h2></div>
+          <div class="prose">
+            <p>반도체·디스플레이 공정에서 나오는 와이퍼, 장갑, 필터, 튜브처럼 케미칼이 묻은 고형 폐기물은 지정폐기물로 분류해 성상별로 따로 배출해야 합니다. 산성과 알칼리성, 유기용제 폐기물이 한 봉투에 섞이면 반응열이나 가스가 생겨 봉투가 녹거나 탄화될 수 있기 때문입니다.</p>
+            <p>제일플러스 폐기물 봉투는 성상마다 색이 달라 현장에서 바로 구분할 수 있습니다. 산은 노란색, 알칼리는 파란색, 유기용제는 분홍색입니다. 봉투 표면에 대상 물질, 배출 상한선, 배출 부서·일자 기재란이 인쇄되어 있어 분리배출 기준을 지키기 쉽고, 반투명이라 열지 않고도 내용물을 확인할 수 있습니다.</p>
+            <p>원단은 PET·나일론·LLDPE를 겹친 삼중합지로 일반 PE 봉투보다 잘 찢어지지 않습니다. 3중 슬라이드 지퍼가 냄새가 새는 것을 줄이고, 30도 변온 스티커가 봉투 안의 이상 발열을 눈으로 확인하게 해 줍니다. 액상이나 액체가 담긴 용기는 넣지 마세요.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-muted">
+        <div class="container">
+          <div class="section-heading"><p>WITH WASTE BAGS</p><h2>함께 쓰는 폐기물 관리 용품</h2></div>
+          <div class="product-grid product-grid-compact">${extras.map((p) => productCard(p)).join("")}</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container detail-spec-grid">
+          <div class="section-heading"><p>FAQ</p><h2>폐기물 봉투 자주 묻는 질문</h2></div>
+          <div class="faq">${WASTE_BAGS_FAQ.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")}</div>
+        </div>
+      </section>`;
+  const items = [...bags, al];
+  const ld = [
+    organization,
+    breadcrumbLd(crumbs),
+    { "@type": "CollectionPage", name: title, url: abs(WASTE_BAGS_PATH), mainEntity: { "@type": "ItemList", itemListElement: items.map((p, i) => ({ "@type": "ListItem", position: i + 1, url: abs(productPath(p)), name: p.name })) } },
+    { "@type": "FAQPage", mainEntity: WASTE_BAGS_FAQ.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) },
+  ];
+  return layout({ path: WASTE_BAGS_PATH, title, description, ld, body, ogImage: imgPath(bags[0].images[0].file) });
+}
+
 // ───────── 제품 상세 ─────────
 function productPage(p) {
   const c = catBySlug[p.category];
-  const crumbs = [["홈", "/"], [c.name, categoryPath(c)], [p.name, productPath(p)]];
+  const isBag = ["acid-waste-bag", "alkali-waste-bag", "organic-waste-bag", "aluminum-zipper-bag"].includes(p.slug);
+  const crumbs = [["홈", "/"], [c.name, categoryPath(c)], ...(isBag ? [["폐기물 봉투", WASTE_BAGS_PATH]] : []), [p.name, productPath(p)]];
   const summary = p.specs.slice(0, 3);
   const gallery = `<div class="gallery" data-gallery>
             <div class="photo-frame detail-photo">${img(p.images[0], 'fetchpriority="high" data-gallery-main ')}</div>
@@ -351,6 +429,7 @@ function sitemap() {
   const urls = [
     ["/", "1.0"],
     ["/products/", "0.9"],
+    [WASTE_BAGS_PATH, "0.9"],
     ...categories.map((c) => [categoryPath(c), "0.8"]),
     ...products.map((p) => [productPath(p), "0.8"]),
     ["/privacy", "0.2"],
@@ -379,7 +458,8 @@ for (const p of products) {
 }
 write("index.html", homePage());
 write("products/index.html", allProductsPage());
+write("products/waste-bags.html", wasteBagsPage());
 for (const c of categories) write(`products/${c.slug}.html`, categoryPage(c));
 for (const p of products) write(`products/${p.slug}.html`, productPage(p));
 write("sitemap.xml", sitemap());
-console.log(`생성 완료: 메인 1, 목록 ${1 + categories.length}, 제품 ${products.length}, sitemap.xml`);
+console.log(`생성 완료: 메인 1, 목록 ${2 + categories.length}, 제품 ${products.length}, sitemap.xml`);

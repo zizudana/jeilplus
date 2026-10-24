@@ -4,6 +4,7 @@ Cloudflare에 배포되는 정적 사이트입니다. 제품 페이지는 데이
 
 ## 구조
 
+- `/products/waste-bags`: "폐기물 봉투" 검색용 대표 페이지 (`scripts/build.mjs`의 `wasteBagsPage`)
 - `data/products.mjs`: 회사 정보, 카테고리 3개, 제품 21개 (이름·설명·규격·가격·사진·FAQ)
 - `scripts/build.mjs`: 데이터 파일로 `index.html`, `products/*.html`, `sitemap.xml`을 생성
 - `scripts/serve.mjs`: 로컬 미리보기 서버 (Cloudflare처럼 확장자 없는 주소 지원)
