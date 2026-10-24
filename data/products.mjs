@@ -1,5 +1,6 @@
 // 제품 데이터. 이 파일을 수정한 뒤 `node scripts/build.mjs`를 실행하면 HTML 페이지가 다시 생성됩니다.
 // 가격·규격·제품코드는 다음 카페 "제일플러스 제품" 게시판 글을 기준으로 합니다: https://cafe.daum.net/jeilplus/llIa
+// cafe: { site: "naver" }인 항목은 네이버 카페 https://cafe.naver.com/jpd0396 글 번호입니다.
 
 export const company = {
   name: "제일플러스 JPD",
@@ -592,5 +593,32 @@ export const products = [
     ],
     cafe: { num: 747, date: "2026-07-01" },
     related: ["cleaning-cart", "stair-cover"],
+  },
+  {
+    slug: "mobile-tv-stand",
+    category: "custom-fabrication",
+    name: "이동식 TV거치대 (70~100인치)",
+    tag: "AL",
+    short: "800 × 450 × H1,800mm 알루미늄 프로파일 이동식 TV 스탠드",
+    title: "이동식 TV거치대 70~100인치 | 알루미늄 프로파일 TV 스탠드 | 제일플러스 JPD",
+    description: "70~100인치 TV용 이동식 거치대(800×450×H1,800mm). AL 프로파일·SS30 도장·아크릴판, 높이 조절, 브라켓 포함. 판매가 1,120,000원.",
+    h1: "70~100인치용<br />이동식 TV거치대",
+    lead: "70~100인치 대형 TV를 올려 옮겨 쓸 수 있는 이동식 거치대입니다. 높이를 최대 1,800mm까지 올릴 수 있고 높이 조절이 가능하며, TV 고정 브라켓이 포함되어 있습니다.",
+    body: [
+      "알루미늄 프로파일로 기둥을 세우고 SS30 도장 부품과 아크릴판을 조합해 만들었습니다. 30kg 이상의 대형 TV를 기준으로 설계했습니다.",
+      "설치 장소, TV 크기, 필요한 높이에 맞춰 구성을 바꾸고 싶으시면 상담해 주세요.",
+    ],
+    specs: [
+      ["규격", "800 × 450 × H 1,800mm"],
+      ["적용 TV", "70~100인치, 30kg 이상"],
+      ["재질", "AL 프로파일, SS30 도장, 아크릴판"],
+      ["구성", "높이 조절 가능, 브라켓 포함"],
+      ["제품코드", "JPTV-02"],
+    ],
+    price: 1120000,
+    priceUnit: "대",
+    images: [{ file: "mobile-tv-stand-1.jpg", alt: "70~100인치용 이동식 TV거치대 외관" }],
+    cafe: { site: "naver", num: 15, date: "2026-09-29" },
+    related: ["cleaning-cart", "ladder-modification"],
   },
 ];

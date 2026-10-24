@@ -4,7 +4,7 @@ Cloudflare에 배포되는 정적 사이트입니다. 제품 페이지는 데이
 
 ## 구조
 
-- `data/products.mjs`: 회사 정보, 카테고리 3개, 제품 20개 (이름·설명·규격·가격·사진·FAQ)
+- `data/products.mjs`: 회사 정보, 카테고리 3개, 제품 21개 (이름·설명·규격·가격·사진·FAQ)
 - `scripts/build.mjs`: 데이터 파일로 `index.html`, `products/*.html`, `sitemap.xml`을 생성
 - `scripts/serve.mjs`: 로컬 미리보기 서버 (Cloudflare처럼 확장자 없는 주소 지원)
 - `images/products/`: 제품 사진 (`<제품주소>-<번호>.jpg`, 긴 변 1200px)
